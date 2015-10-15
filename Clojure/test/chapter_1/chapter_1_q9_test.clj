@@ -1,4 +1,4 @@
-(ns chapter-1.chapter_1_q9_test
+(ns chapter-1.chapter-1-q9-test
   (:require [clojure.test :refer :all]
             [chapter-1.chapter-1-q9 :refer :all]))
 
@@ -11,5 +11,3 @@
   (is (not (rotation? "waterbottle" "etbottlewat")))
   (is (rotation? "waterbottle" "erbottlewat"))
   (is (rotation? "watbottlewat" "twatbottlewa")))
-
-(run-tests)
