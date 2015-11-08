@@ -3,8 +3,17 @@
             [data-structures.stack :refer :all]))
 
 (deftest stacks-test
+
+  (testing "empty/non-empty"
+    (let [stack (create-stack)]
+      (is (stack-empty? stack))
+      (stack-push stack 1)
+      (is (not (stack-empty? stack)))
+      (is (= 1 (stack-pop stack)))))
+
   (testing "1-2 nodes"
     (is (not (stack-empty? (create-stack 5))))
+    (is (= 5 (stack-peek (create-stack 5))))
 
     (let [stack (create-stack 5)]
       (is (not (stack-empty? stack)))
@@ -15,6 +24,7 @@
       (is (= 6 (stack-peek stack)))
       (is (= 6 (stack-pop stack)))
       (is (= 5 (stack-pop stack)))
+
       (is (stack-empty? stack))
       (is (thrown? IllegalStateException (stack-pop stack)))
       (stack-push stack 7)
@@ -45,3 +55,5 @@
         (stack-push stack 7)
         (is (= 7 (stack-pop stack)))
         (is (stack-empty? stack))))))
+
+(run-tests)
