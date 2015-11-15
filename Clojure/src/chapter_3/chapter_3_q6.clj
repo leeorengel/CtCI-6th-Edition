@@ -2,19 +2,6 @@
   (:require [data-structures.stack :refer :all])
   (import java.util.LinkedList))
 
-;; Algorithm:
-;; - worst-case dequeueAny O(1)
-;; - worst-case dequeueDog or Cat is O(n)
-;; use 3 LinkedList instances
-;; A - queue of all animals
-;; B - pop queue of 1st animal type to be popped
-;; C - pop queue of 2nd animal type to be popped
-;; pop-order is B, C, A
-;; maintain oldest dog and cat indices in A queue
-;; this optimizes for worst case of oldest type being at end of queue
-;; because you pop if off the end instead of the beginning
-;; you also need a overflow stack for the last case
-
 (defrecord Animal [type age])
 
 (defprotocol AnimalShelter
