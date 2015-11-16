@@ -10,7 +10,7 @@
 
 (defrecord Node [data next])
 
-(defrecord SimpleStack [^Atom top size]
+(defrecord SimpleStack [^Atom top ^Atom size]
   Stack
   (stack-pop [this]
     (when (nil? @top)
