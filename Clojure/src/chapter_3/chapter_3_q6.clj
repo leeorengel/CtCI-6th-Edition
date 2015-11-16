@@ -10,43 +10,32 @@
   (dequeue-dog [this])
   (dequeue-cat [this]))
 
-;; TODO - Optimization keep track of oldest animal of each type and dequeue from opposite side
-;; if its closer
-
-(defn- get-oldest [shelter type]
-  "Searches animal-q for oldest of provided type and returns it. All previous elements
-  are dequeued and pushed onto a stack for their respective type."
-  (let [animal-q (:animal-q shelter)
-        type-overflow-q (:type-overflow-q shelter)]
-    (loop [next-animal (.poll animal-q)]
-      (if (nil? next-animal)
-        nil
-        (if (= type (:type next-animal))
-          next-animal
-          (do (.offer type-overflow-q next-animal)
-              (recur (.poll animal-q))))))))
-
-(defn- dequeue-type [shelter type]
-  (let [type-overflow-q (:type-overflow-q shelter)]
-    (cond (= type (:type (.peek type-overflow-q))) (.poll type-overflow-q)
-          :else (get-oldest shelter type))))
-
-(defrecord AnimalShelterQueues [animal-q type-overflow-q temp-q]
+(defrecord AnimalShelterQueues [dog-q cat-q]
   AnimalShelter
 
   (enqueue [this type]
-    (let [animal (->Animal type (.size animal-q))]
-      (.offer animal-q animal)))
+    (let [animal (->Animal type (+ (.size dog-q) (.size cat-q)))]
+      (if (= type :cat)
+        (.offer cat-q animal)
+        (.offer dog-q animal)
+        )))
 
   (dequeue-any [this]
-    (cond (not (.isEmpty type-overflow-q)) (.poll type-overflow-q)
-          :else (.poll animal-q)))
+    (if (or (.isEmpty dog-q) (.isEmpty cat-q))
+      (if (.isEmpty dog-q)
+        (.poll cat-q)
+        (.poll dog-q))
+      (let [oldest-dog (.peek dog-q)
+            oldest-cat (.peek cat-q)]
+        (if (< (:age oldest-dog) (:age oldest-cat))
+          (.poll dog-q)
+          (.poll cat-q)))))
 
   (dequeue-dog [this]
-    (dequeue-type this :dog))
+    (.poll dog-q))
 
   (dequeue-cat [this]
-    (dequeue-type this :cat)))
+    (.poll cat-q)))
 
 (defn create-animal-shelter []
-  (->AnimalShelterQueues (new LinkedList) (new LinkedList) (new LinkedList)))
+  (->AnimalShelterQueues (new LinkedList) (new LinkedList)))

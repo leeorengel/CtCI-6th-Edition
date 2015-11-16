@@ -75,9 +75,6 @@
       (enqueue shelter :dog)
 
       (is (= (->Animal :cat 0) (dequeue-cat shelter)))
-      (is (= (->Animal :cat 3) (dequeue-cat shelter)))
-      ))
-
-  )
+      (is (= (->Animal :cat 3) (dequeue-cat shelter))))))
 
 (run-tests)
