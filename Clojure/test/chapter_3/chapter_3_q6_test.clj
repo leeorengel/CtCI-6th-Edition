@@ -7,74 +7,96 @@
 (deftest animal-shelter-test
   (testing "basic tests"
     (let [shelter (create-animal-shelter)]
-      (enqueue shelter :cat)
-      (is (= (->Animal :cat 0) (dequeue-any shelter)))
-      (enqueue shelter :cat)
-      (is (= (->Animal :cat 0) (dequeue-cat shelter)))
-      (enqueue shelter :dog)
-      (is (= (->Animal :dog 0) (dequeue-any shelter)))
-      (enqueue shelter :dog)
-      (is (= (->Animal :dog 0) (dequeue-dog shelter)))
+      (enqueue shelter :cat "whiskers")
 
-      (enqueue shelter :dog)
-      (enqueue shelter :cat)
+      (let [animal (dequeue-any shelter)]
+        (is (= :cat (:type animal)))
+        (is (= "whiskers" (:name animal))))
 
-      (is (= (->Animal :dog 0) (dequeue-any shelter)))
-      (is (= (->Animal :cat 1) (dequeue-any shelter)))
+      (enqueue shelter :cat "kitty")
 
-      (enqueue shelter :dog)
-      (enqueue shelter :cat)
-      (is (= (->Animal :dog 0) (dequeue-dog shelter)))
-      (is (= (->Animal :cat 1) (dequeue-cat shelter)))
+      (let [animal (dequeue-cat shelter)]
+        (is (= :cat (:type animal)))
+        (is (= "kitty" (:name animal))))
 
-      (enqueue shelter :dog)
-      (enqueue shelter :dog)
-      (enqueue shelter :cat)
-      (enqueue shelter :cat)
-      (enqueue shelter :cat)
+      (enqueue shelter :dog "fido")
 
-      (is (= (->Animal :dog 0) (dequeue-dog shelter)))
-      (is (= (->Animal :dog 1) (dequeue-any shelter)))
-      (is (= (->Animal :cat 2) (dequeue-cat shelter)))
-      (is (= (->Animal :cat 3) (dequeue-any shelter)))
-      (is (= (->Animal :cat 4) (dequeue-any shelter)))))
+      (let [animal (dequeue-any shelter)]
+        (is (= :dog (:type animal)))
+        (is (= "fido" (:name animal))))
+
+      (enqueue shelter :dog "spot")
+
+      (let [animal (dequeue-dog shelter)]
+        (is (= :dog (:type animal)))
+        (is (= "spot" (:name animal))))
+
+      (enqueue shelter :dog "rex")
+      (enqueue shelter :cat "oliver")
+
+      (let [a1 (dequeue-any shelter)
+            a2 (dequeue-any shelter)]
+        (is (= :dog (:type a1))
+            (= "rex" (:name a1)))
+        (is (= :cat (:type a2))
+            (= "oliver" (:name a2))))
+
+      (enqueue shelter :dog "cujo")
+      (enqueue shelter :cat "mittens")
+
+      (let [dog (dequeue-dog shelter)
+            cat (dequeue-cat shelter)]
+        (is (= :dog (:type dog))
+            (= "cujo" (:name dog)))
+        (is (= :cat (:type cat))
+            (= "mittens" (:name cat))))
+
+      (enqueue shelter :dog "spot 2")
+      (enqueue shelter :dog "buddy")
+      (enqueue shelter :cat "garfield")
+      (enqueue shelter :cat "kiki")
+      (enqueue shelter :cat "tiger")
+
+      (let [a1 (dequeue-dog shelter)
+            a2 (dequeue-any shelter)
+            a3 (dequeue-cat shelter)
+            a4 (dequeue-any shelter)
+            a5 (dequeue-any shelter)]
+        (is (= :dog (:type a1))
+            (= "spot 2" (:name a1)))
+        (is (= :dog (:type a2))
+            (= "buddy" (:name a2)))
+        (is (= :cat (:type a3))
+            (= "garfield" (:name a3)))
+        (is (= :cat (:type a4))
+            (= "kiki" (:name a4)))
+        (is (= :cat (:type a5))
+            (= "tiger" (:name a5))))))
 
   (testing "Oldest cat, rest dogs"
     (let [shelter (create-animal-shelter)]
-      (enqueue shelter :cat)
-      (enqueue shelter :dog)
-      (enqueue shelter :dog)
-      (enqueue shelter :dog)
+      (enqueue shelter :cat "kiki")
+      (enqueue shelter :dog "rex")
+      (enqueue shelter :dog "spot")
+      (enqueue shelter :dog "fido")
 
-      (is (= (->Animal :cat 0) (dequeue-cat shelter)))
-      (is (= (->Animal :dog 1) (dequeue-dog shelter)))
-      (is (= (->Animal :dog 2) (dequeue-any shelter)))
-      (is (= nil (dequeue-cat shelter)))
-      (is (= (->Animal :dog 3) (dequeue-any shelter)))
-      (is (= nil (dequeue-dog shelter)))
-      (is (= nil (dequeue-any shelter)))
-      ))
-
-  (testing "Using overflow stacks"
-    (let [shelter (create-animal-shelter)]
-      (enqueue shelter :cat)
-      (enqueue shelter :dog)
-      (enqueue shelter :dog)
-      (enqueue shelter :cat)
-      (enqueue shelter :cat)
-      (enqueue shelter :dog)
-      (enqueue shelter :cat)
-      (enqueue shelter :dog)
-
-      (is (= (->Animal :dog 1) (dequeue-dog shelter)))
-      ;; cat 0 is now on overflow queue
-      (enqueue shelter :cat)
-      (is (= (->Animal :dog 2) (dequeue-dog shelter)))
-
-      (enqueue shelter :dog)
-      (enqueue shelter :dog)
-
-      (is (= (->Animal :cat 0) (dequeue-cat shelter)))
-      (is (= (->Animal :cat 3) (dequeue-cat shelter))))))
+      (let [a1 (dequeue-cat shelter)
+            a2 (dequeue-dog shelter)
+            a3 (dequeue-any shelter)
+            a4 (dequeue-cat shelter)
+            a5 (dequeue-any shelter)
+            a6 (dequeue-any shelter)
+            a7 (dequeue-dog shelter)]
+        (is (= :cat (:type a1))
+            (= "kiki" (:name a1)))
+        (is (= :dog (:type a2))
+            (= "rex" (:name a2)))
+        (is (= :dog (:type a3))
+            (= "spot" (:name a3)))
+        (is (= nil a4))
+        (is (= :dog (:type a5))
+            (= "fido" (:name a5)))
+        (is (= nil a6)
+            (= nil a7))))))
 
 (run-tests)

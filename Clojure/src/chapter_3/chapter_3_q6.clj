@@ -1,11 +1,12 @@
 (ns chapter-3.chapter-3-q6
   (:require [data-structures.stack :refer :all])
-  (import java.util.LinkedList))
+  (import java.util.LinkedList
+          (java.util Date)))
 
-(defrecord Animal [type age])
+(defrecord Animal [type name age])
 
 (defprotocol AnimalShelter
-  (enqueue [this type])
+  (enqueue [this type name])
   (dequeue-any [this])
   (dequeue-dog [this])
   (dequeue-cat [this]))
@@ -13,8 +14,8 @@
 (defrecord AnimalShelterQueues [dog-q cat-q]
   AnimalShelter
 
-  (enqueue [this type]
-    (let [animal (->Animal type (+ (.size dog-q) (.size cat-q)))]
+  (enqueue [this type name]
+    (let [animal (->Animal type name (.getTime (new Date)))]
       (if (= type :cat)
         (.offer cat-q animal)
         (.offer dog-q animal)
@@ -27,7 +28,7 @@
         (.poll dog-q))
       (let [oldest-dog (.peek dog-q)
             oldest-cat (.peek cat-q)]
-        (if (< (:age oldest-dog) (:age oldest-cat))
+        (if (<= (:age oldest-dog) (:age oldest-cat))
           (.poll dog-q)
           (.poll cat-q)))))
 
